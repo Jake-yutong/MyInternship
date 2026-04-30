@@ -1,11 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import express from 'express';
 import { loadApplicationsEnvelope, saveApplications } from './storage.js';
 
 const HOST = process.env.MYINTERNSHIP_API_HOST ?? '127.0.0.1';
 const PORT = Number(process.env.MYINTERNSHIP_API_PORT ?? '8787');
 const BODY_LIMIT = process.env.MYINTERNSHIP_API_BODY_LIMIT ?? '15mb';
+const DIST_DIR = path.resolve(process.cwd(), 'dist');
+const DIST_INDEX_FILE = path.join(DIST_DIR, 'index.html');
 
 const app = express();
+const hasBuiltFrontend = fs.existsSync(DIST_INDEX_FILE);
 
 app.use(express.json({ limit: BODY_LIMIT }));
 
@@ -78,6 +83,18 @@ app.use((error, _request, response, _next) => {
   });
 });
 
+if (hasBuiltFrontend) {
+  app.use(express.static(DIST_DIR));
+
+  app.get(/^\/(?!api(?:\/|$)).*/, (_request, response) => {
+    response.sendFile(DIST_INDEX_FILE);
+  });
+}
+
 app.listen(PORT, HOST, () => {
   console.log(`[myinternship-api] listening on http://${HOST}:${PORT}`);
+
+  if (hasBuiltFrontend) {
+    console.log(`[myinternship-api] serving frontend from ${DIST_DIR}`);
+  }
 });
