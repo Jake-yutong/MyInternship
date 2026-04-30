@@ -1,16 +1,37 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
+import { fileURLToPath } from 'node:url';
 
-const DATA_DIR = path.resolve(process.cwd(), 'server/data');
-const DATABASE_FILE = path.join(DATA_DIR, 'applications.sqlite');
-const LEGACY_DATA_FILE = path.join(DATA_DIR, 'applications.json');
-const LEGACY_BACKUP_FILE = path.join(DATA_DIR, 'applications.backup.json');
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT_DIR = path.resolve(MODULE_DIR, '..');
+const DEFAULT_DATA_DIR = path.resolve(PROJECT_DIR, 'server/data');
 const SERVER_STORAGE_SCHEMA_VERSION = 1;
 const CURRENT_SNAPSHOT_KEY = 'current';
 const BACKUP_SNAPSHOT_KEY = 'backup';
 
 let database = null;
+let databaseFilePath = null;
+
+function resolveDataDir() {
+  if (process.env.MYINTERNSHIP_DATA_DIR) {
+    return path.resolve(process.env.MYINTERNSHIP_DATA_DIR);
+  }
+
+  return DEFAULT_DATA_DIR;
+}
+
+function resolveDatabaseFilePath() {
+  return path.join(resolveDataDir(), 'applications.sqlite');
+}
+
+function resolveLegacyDataFilePath() {
+  return path.join(resolveDataDir(), 'applications.json');
+}
+
+function resolveLegacyBackupFilePath() {
+  return path.join(resolveDataDir(), 'applications.backup.json');
+}
 
 function isRecord(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -45,7 +66,7 @@ function createEmptyEnvelope() {
 }
 
 async function ensureDataDir() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.mkdir(resolveDataDir(), { recursive: true });
 }
 
 function getDatabase() {
@@ -53,7 +74,8 @@ function getDatabase() {
     return database;
   }
 
-  database = new DatabaseSync(DATABASE_FILE);
+  databaseFilePath = resolveDatabaseFilePath();
+  database = new DatabaseSync(databaseFilePath);
   database.exec(`
     PRAGMA journal_mode = WAL;
     PRAGMA synchronous = FULL;
@@ -152,7 +174,7 @@ async function readLegacyMigrationSource() {
   let primaryInvalid = false;
 
   try {
-    primaryEnvelope = await readLegacyEnvelopeFromFile(LEGACY_DATA_FILE);
+    primaryEnvelope = await readLegacyEnvelopeFromFile(resolveLegacyDataFilePath());
   } catch (error) {
     if (error?.code !== 'ENOENT') {
       primaryInvalid = true;
@@ -160,7 +182,7 @@ async function readLegacyMigrationSource() {
   }
 
   try {
-    const backupEnvelope = await readLegacyEnvelopeFromFile(LEGACY_BACKUP_FILE);
+    const backupEnvelope = await readLegacyEnvelopeFromFile(resolveLegacyBackupFilePath());
 
     if (primaryEnvelope) {
       return {
@@ -241,7 +263,7 @@ export async function loadApplicationsEnvelope() {
         envelope: parseSnapshotRow(currentSnapshotRow),
         found: true,
         recovered: false,
-        sourceFile: DATABASE_FILE,
+        sourceFile: databaseFilePath ?? resolveDatabaseFilePath(),
       };
     } catch (error) {
       const backupSnapshotRow = getSnapshotRow(BACKUP_SNAPSHOT_KEY);
@@ -251,7 +273,7 @@ export async function loadApplicationsEnvelope() {
           envelope: parseSnapshotRow(backupSnapshotRow),
           found: true,
           recovered: true,
-          sourceFile: DATABASE_FILE,
+          sourceFile: databaseFilePath ?? resolveDatabaseFilePath(),
         };
       }
 
@@ -266,7 +288,7 @@ export async function loadApplicationsEnvelope() {
       envelope: migratedSource.envelope,
       found: true,
       recovered: migratedSource.recovered,
-      sourceFile: DATABASE_FILE,
+      sourceFile: databaseFilePath ?? resolveDatabaseFilePath(),
     };
   }
 
@@ -274,7 +296,7 @@ export async function loadApplicationsEnvelope() {
     envelope: createEmptyEnvelope(),
     found: false,
     recovered: false,
-    sourceFile: DATABASE_FILE,
+    sourceFile: databaseFilePath ?? resolveDatabaseFilePath(),
   };
 }
 

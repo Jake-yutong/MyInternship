@@ -1,5 +1,6 @@
 MyInternship Progress Tracker/node_modules/
 MyInternship Progress Tracker/dist/
+MyInternship Progress Tracker/release/
 MyInternship Progress Tracker/server/data/*.json
 MyInternship Progress Tracker/server/data/*.sqlite*
 *.log

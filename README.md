@@ -76,6 +76,24 @@ http://127.0.0.1:8787/api/health
 
 这个方案适用于当前 Linux 环境，且能保留现有 SQLite 后端思路。
 
+## 桌面应用方案
+
+如果你希望它更像真正的软件，而不是“浏览器 + 脚本”，当前项目也已经接入了桌面打包路径。
+
+现在支持：
+
+- 直接本地启动桌面版：在项目目录运行 npm run desktop:start
+- 生成未打包桌面产物：npm run desktop:pack
+- 生成 Linux AppImage：npm run desktop:dist
+
+桌面版特点：
+
+- 会在应用内部自动启动本地 Express + SQLite 服务
+- 不再依赖单独手动打开浏览器地址
+- 数据默认存到系统用户目录，而不是仓库目录里
+
+当前优先支持 Linux 桌面环境。
+
 ## 手动运行与构建
 
 ```bash

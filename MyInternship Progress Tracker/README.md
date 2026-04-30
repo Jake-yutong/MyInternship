@@ -117,6 +117,24 @@ http://127.0.0.1:8787/api/health
 - npm run open:local: 自动确保服务运行并打开浏览器
 - npm run uninstall:local:linux: 移除本地服务和桌面启动器
 
+## 桌面应用模式
+
+如果你希望它成为真正的桌面程序，而不是启动浏览器页面，当前项目已经接入 Electron 桌面壳。
+
+可用命令：
+
+- npm run desktop:start: 构建后直接启动桌面应用
+- npm run desktop:pack: 生成未打包桌面产物，输出到 release/linux-unpacked
+- npm run desktop:dist: 生成 Linux AppImage
+
+桌面模式下：
+
+- Electron 主进程会自动拉起本地 Express 服务
+- 前端页面会直接显示在桌面窗口里
+- SQLite 数据目录会切换到系统用户数据目录，不再依赖仓库里的 server/data
+
+这意味着你可以把它当作一个真正的本地应用来打开和分发。
+
 ## 手动命令
 
 ```bash
@@ -130,6 +148,9 @@ npm run build
 ## 可用脚本
 
 - npm run dev: 启动 Vite 开发服务器
+- npm run desktop:start: 启动桌面应用
+- npm run desktop:pack: 生成未打包桌面产物
+- npm run desktop:dist: 生成 Linux AppImage
 - npm run dev:server: 启动本地后端 API
 - npm run install:local:linux: 一次性安装 Linux 本地服务和桌面启动器
 - npm run open:local: 打开本地应用，必要时自动拉起服务

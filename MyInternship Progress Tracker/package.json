@@ -2,13 +2,23 @@
   "name": "@figma/my-make-file",
   "private": true,
   "version": "0.0.1",
+  "description": "MyInternship desktop-first internship application tracker",
+  "author": "Jake-yutong",
   "type": "module",
+  "main": "electron/main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jake-yutong/MyInternship.git"
+  },
   "engines": {
     "node": ">=24.0.0"
   },
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "desktop:dist": "npm run build && electron-builder --linux AppImage",
+    "desktop:pack": "npm run build && electron-builder --dir",
+    "desktop:start": "npm run build && electron .",
     "dev:server": "node ./server/index.js",
     "install:local:linux": "bash ./install-local-linux.sh",
     "open:local": "bash ./open-local.sh",
@@ -77,6 +87,8 @@
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
+    "electron": "41.3.0",
+    "electron-builder": "26.8.1",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },
@@ -95,6 +107,35 @@
   "pnpm": {
     "overrides": {
       "vite": "6.3.5"
+    }
+  },
+  "build": {
+    "appId": "com.jakeyutong.myinternship",
+    "productName": "MyInternship",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "package.json",
+      "!server/data/*.sqlite",
+      "!server/data/*.sqlite-shm",
+      "!server/data/*.sqlite-wal",
+      "!server/data/*.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Office"
+    },
+    "asarUnpack": [
+      "server/**/*"
+    ],
+    "extraMetadata": {
+      "main": "electron/main.js"
     }
   }
 }
