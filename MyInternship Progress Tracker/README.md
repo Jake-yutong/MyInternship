@@ -1,7 +1,7 @@
 
 # MyInternship Progress Tracker
 
-MyInternship Progress Tracker 是“麦恩忒诗”应用的前端实现。这个目录最初来源于 Figma 导出的代码包，现已扩展为一个可实际使用的本地化实习投递追踪工具。
+MyInternship Progress Tracker 是“麦恩忒诗”应用的前后端一体目录。这个目录最初来源于 Figma 导出的前端代码包，现已扩展为一个可实际使用的本地化实习投递追踪工具。
 
 原始设计链接：
 https://www.figma.com/design/uMmWLsstRjQ8E3DrRprJ3Z/MyInternship-Progress-Tracker
@@ -12,6 +12,8 @@ https://www.figma.com/design/uMmWLsstRjQ8E3DrRprJ3Z/MyInternship-Progress-Tracke
 - Vite 6
 - TypeScript
 - Tailwind CSS 4
+- Node.js 24+
+- Express 本地 API
 
 ## 已实现功能
 
@@ -28,13 +30,22 @@ https://www.figma.com/design/uMmWLsstRjQ8E3DrRprJ3Z/MyInternship-Progress-Tracke
 
 ### 3. 本地持久化
 
-- 所有记录保存在浏览器 localStorage 中
+- 默认优先写入本地 SQLite 数据库，而不是只依赖浏览器 localStorage
+- 浏览器 localStorage 继续作为兜底缓存
 - 存储结构使用稳定 key，而不是和版本强耦合的 key
 - 存储内容包含 schemaVersion，支持后续迁移
 - 同时写入备份 key，用于主数据异常时恢复
 - 兼容旧 key 的历史数据读取与迁移
 
-### 4. 智能输入增强
+### 4. 本地后端
+
+- 提供 /api/health 健康检查接口
+- 提供 /api/applications 读写接口
+- 使用 SQLite 落盘，并在数据库内保留 current/backup 两份快照
+- 当前默认数据文件路径为 server/data/applications.sqlite
+- 若检测到旧的 applications.json 或 applications.backup.json，会在首次读取时自动迁移到 SQLite
+
+### 5. 智能输入增强
 
 - 可从 JD 文本中提取公司、岗位等基础信息
 - 可根据链接 hostname 推断公司来源
@@ -53,6 +64,7 @@ npm run start:local
 - 自动检测 npm 是否可用
 - 首次运行时自动安装依赖
 - 以 127.0.0.1:5173 启动 Vite 开发服务器
+- 以 127.0.0.1:8787 启动本地 API 服务
 
 推荐固定使用这个地址，是因为 localStorage 按“协议 + 域名 + 端口”隔离。开发时如果端口频繁变化，会导致你看到的是另一份本地存储。
 
@@ -62,25 +74,42 @@ npm run start:local
 http://127.0.0.1:5173
 ```
 
+后端健康检查：
+
+```text
+http://127.0.0.1:8787/api/health
+```
+
 ## 手动命令
 
 ```bash
 npm install
 npm run dev
+npm run dev:server
+npm run start:server
 npm run build
 ```
 
 ## 可用脚本
 
 - npm run dev: 启动 Vite 开发服务器
+- npm run dev:server: 启动本地后端 API
+- npm run start:server: 启动本地后端 API
 - npm run build: 生成生产构建
-- npm run start:local: 一键本地启动，自动安装依赖并固定地址
+- npm run start:local: 一键本地启动，同时拉起前后端并固定地址
+
+## 运行前提
+
+- Node.js 24 或更高版本
+- 后端依赖 Node 内置的 node:sqlite 模块
 
 ## 数据持久化说明
 
-当前实现是“纯本地、单用户、单浏览器配置”模型：
+当前实现是“纯本地、单用户、本机文件持久化 + 浏览器缓存兜底”模型：
 
-- 数据只存在当前浏览器的 localStorage
+- 数据默认写入当前机器上的后端文件
+- 数据主存储现在是 SQLite，不再依赖 JSON 文件整包重写
+- 浏览器 localStorage 只作为前端缓存与后端不可用时的回退方案
 - 没有账号系统、云同步、多人协作或服务端数据库
 - 浏览器缓存清理、切换浏览器、切换设备后不会自动同步
 
@@ -96,6 +125,7 @@ npm run build
 src/
   app/
     App.tsx                主状态与页面调度
+    api.ts                 前端到本地后端的 API 请求封装
     data.ts                应用数据模型、状态配置、迁移与存储解析
     hooks/
       useLocalStorage.ts   本地存储 Hook
@@ -104,6 +134,10 @@ src/
       GanttView.tsx        甘特图视图
       SlideOutPanel.tsx    新增/编辑面板
       DeleteModal.tsx      删除确认弹窗
+server/
+  index.js                本地 Express API 入口
+  storage.js              SQLite 存储、备份快照与 JSON 迁移逻辑
+  data/                   运行时数据目录
 ```
 
 ## 适用场景

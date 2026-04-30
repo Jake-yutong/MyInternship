@@ -557,7 +557,7 @@ function migrateApplicationsStorageEnvelope(envelope: ApplicationsStorageEnvelop
   } satisfies ApplicationsStorageEnvelope;
 }
 
-function parseApplicationsPayload(payload: unknown) {
+export function parseApplicationsPayload(payload: unknown) {
   if (Array.isArray(payload)) {
     return normalizeStoredApplications(payload);
   }

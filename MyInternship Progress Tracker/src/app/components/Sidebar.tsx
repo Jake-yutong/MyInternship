@@ -13,9 +13,10 @@ interface SidebarProps {
   activeView: 'card' | 'gantt';
   setActiveView: (view: 'card' | 'gantt') => void;
   onAddNew: () => void;
+  storageStatusText: string;
 }
 
-export function Sidebar({ activeView, setActiveView, onAddNew }: SidebarProps) {
+export function Sidebar({ activeView, setActiveView, onAddNew, storageStatusText }: SidebarProps) {
   return (
     <div className="w-64 h-screen bg-[#F7F7F5] dark:bg-[#202020] border-r border-[#E9E9E7] dark:border-neutral-800 flex flex-col flex-shrink-0 text-[#37352F] dark:text-[#EBEBEA] select-none transition-colors duration-200">
       <div className="p-4 pt-6 pb-2">
@@ -76,7 +77,7 @@ export function Sidebar({ activeView, setActiveView, onAddNew }: SidebarProps) {
 
       <div className="p-4 border-t border-[#E9E9E7] dark:border-neutral-800 text-xs flex items-center gap-2 text-neutral-400 dark:text-neutral-500 transition-colors">
         <Clock size={14} />
-        <span>本地运行中 (Local Host) • 刚刚保存</span>
+        <span>{storageStatusText}</span>
       </div>
     </div>
   );

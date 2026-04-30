@@ -5,11 +5,19 @@ import { useTheme } from 'next-themes';
 interface TopBarProps {
   activeView: 'card' | 'gantt';
   setActiveView: (view: 'card' | 'gantt') => void;
+  storageStatusLabel: string;
+  storageStatusTone: 'success' | 'warning' | 'neutral';
 }
 
-export function TopBar({ activeView, setActiveView }: TopBarProps) {
+export function TopBar({ activeView, setActiveView, storageStatusLabel, storageStatusTone }: TopBarProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  const storageStatusClassName = storageStatusTone === 'success'
+    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900'
+    : storageStatusTone === 'warning'
+      ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900'
+      : 'bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700';
 
   useEffect(() => {
     setMounted(true);
@@ -21,6 +29,9 @@ export function TopBar({ activeView, setActiveView }: TopBarProps) {
         <span className="text-neutral-500 dark:text-neutral-400 transition-colors">所有投递 /</span>
         <span className="text-neutral-800 dark:text-neutral-200 transition-colors">
           {activeView === 'card' ? '卡片视图' : '甘特图视图'}
+        </span>
+        <span className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${storageStatusClassName}`}>
+          {storageStatusLabel}
         </span>
       </div>
 
