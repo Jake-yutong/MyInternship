@@ -101,6 +101,22 @@ http://127.0.0.1:8787
 http://127.0.0.1:8787/api/health
 ```
 
+## 推荐的个人本地使用方式
+
+如果你暂时不打算给别人用，只想自己在本机“一键打开直接用”，推荐走下面这条路线：
+
+1. 第一次安装时执行 npm run install:local:linux
+2. 它会完成依赖安装、前端构建、本地服务注册和桌面启动器创建
+3. 以后只需要点击桌面应用菜单里的 MyInternship，或者执行 npm run open:local
+
+这样你就不需要每次再手动运行开发服务器或启动脚本。
+
+相关脚本：
+
+- npm run install:local:linux: 一次性安装本地服务和桌面启动器
+- npm run open:local: 自动确保服务运行并打开浏览器
+- npm run uninstall:local:linux: 移除本地服务和桌面启动器
+
 ## 手动命令
 
 ```bash
@@ -115,9 +131,12 @@ npm run build
 
 - npm run dev: 启动 Vite 开发服务器
 - npm run dev:server: 启动本地后端 API
+- npm run install:local:linux: 一次性安装 Linux 本地服务和桌面启动器
+- npm run open:local: 打开本地应用，必要时自动拉起服务
 - npm run start:server: 启动本地后端 API
 - npm run build: 生成生产构建
 - npm run start:local: 一键本地启动，同时拉起前后端并固定地址
+- npm run uninstall:local:linux: 卸载 Linux 本地服务和桌面启动器
 
 ## 运行前提
 

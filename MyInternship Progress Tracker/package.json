@@ -10,8 +10,11 @@
     "build": "vite build",
     "dev": "vite",
     "dev:server": "node ./server/index.js",
+    "install:local:linux": "bash ./install-local-linux.sh",
+    "open:local": "bash ./open-local.sh",
     "start:server": "node ./server/index.js",
-    "start:local": "bash ./start-local.sh"
+    "start:local": "bash ./start-local.sh",
+    "uninstall:local:linux": "bash ./uninstall-local-linux.sh"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
