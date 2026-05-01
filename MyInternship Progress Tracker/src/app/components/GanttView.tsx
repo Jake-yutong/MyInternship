@@ -1,12 +1,15 @@
 import React from 'react';
 import { addDays, addMonths, differenceInCalendarDays, endOfMonth, format, startOfMonth } from 'date-fns';
 import { Application, STATUS_CONFIG, dateValueToDate, getApplicationTimeline, getCompanyAccentColor, getCompanyInitial } from '../data';
+import { useLogoColors } from '../hooks/useLogoColors';
 
 interface GanttViewProps {
   applications: Application[];
 }
 
 export function GanttView({ applications }: GanttViewProps) {
+  const logoColors = useLogoColors(applications);
+
   const timelineRows = applications.map((application) => ({
     application,
     stages: getApplicationTimeline(application),
@@ -173,7 +176,7 @@ export function GanttView({ applications }: GanttViewProps) {
                           left: `${left}%`,
                           width: `${width}%`,
                           minWidth: 'fit-content',
-                          backgroundColor: stage.accentColor,
+                          backgroundColor: logoColors.get(application.id) ?? stage.accentColor,
                         }}
                         title={`${stage.label} (${stage.date})`}
                       >

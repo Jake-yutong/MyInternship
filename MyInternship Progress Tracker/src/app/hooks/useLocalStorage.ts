@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type SetValue<T> = T | ((currentValue: T) => T);
 
@@ -21,8 +21,10 @@ export function useLocalStorage<T>(
   const deserialize = options.deserialize ?? ((value: string) => JSON.parse(value) as T);
   const backupKey = options.backupKey;
 
+  const initialValueRef = useRef(initialValue);
+
   const readValue = useCallback(() => {
-    const fallbackValue = resolveInitialValue(initialValue);
+    const fallbackValue = resolveInitialValue(initialValueRef.current);
 
     if (typeof window === 'undefined') {
       return fallbackValue;
@@ -34,7 +36,7 @@ export function useLocalStorage<T>(
     } catch {
       return fallbackValue;
     }
-  }, [deserialize, initialValue, key]);
+  }, [deserialize, key]);
 
   const [storedValue, setStoredValue] = useState<T>(() => readValue());
 
@@ -85,8 +87,8 @@ export function useLocalStorage<T>(
     if (backupKey) {
       window.localStorage.removeItem(backupKey);
     }
-    setStoredValue(resolveInitialValue(initialValue));
-  }, [backupKey, initialValue, key]);
+    setStoredValue(resolveInitialValue(initialValueRef.current));
+  }, [backupKey, key]);
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
