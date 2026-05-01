@@ -20,8 +20,11 @@ export function ApplicationCard({ application, onClick, onDelete }: CardProps) {
 
   const handleApplyLink = (e: React.MouseEvent) => {
     e.stopPropagation();
-    window.open(application.applyLink, '_blank', 'noopener,noreferrer');
+    const url = application.applyLink || application.jobLink;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
+
+  const applyLinkUrl = application.applyLink || application.jobLink;
 
   return (
     <div 
@@ -84,11 +87,11 @@ export function ApplicationCard({ application, onClick, onDelete }: CardProps) {
           >
             <Trash2 size={15} />
           </button>
-          {application.applyLink ? (
+          {applyLinkUrl ? (
             <button
               onClick={handleApplyLink}
               className="w-8 h-8 rounded-full flex items-center justify-center text-blue-500 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-200"
-              title="打开网申页面"
+              title={application.applyLink ? '打开网申页面' : '打开职位链接'}
             >
               <ExternalLink size={15} />
             </button>
