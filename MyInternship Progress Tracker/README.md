@@ -19,9 +19,8 @@ https://www.figma.com/design/uMmWLsstRjQ8E3DrRprJ3Z/MyInternship-Progress-Tracke
 
 补充说明：
 
-- GitHub Pages 部署 workflow 已经配置完成，预期公开地址是 https://jake-yutong.github.io/MyInternship/
-- 但当前仓库还缺一次 GitHub Pages 设置启用，因此这个网页地址暂时还不能直接访问
-- GitHub Pages 启用后，网页版会运行在浏览器本地缓存模式，适合直接分享链接使用
+- GitHub Pages 已启用，网页版公开地址：https://jake-yutong.github.io/MyInternship/
+- 网页版运行在浏览器本地缓存模式，适合直接分享链接使用，无需本地服务
 - Linux 桌面版下载链接会始终指向仓库最新 Release 的 AppImage
 - 本地前端开发地址适用于 npm run start:local 或 npm run dev
 - 本地单服务访问地址适用于 npm run build 后再运行 npm run start:server
