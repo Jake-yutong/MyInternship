@@ -38,3 +38,4 @@ jobs:
           files: |
             MyInternship Progress Tracker/release/*.AppImage
             MyInternship Progress Tracker/release/latest-linux.yml
+            MyInternship Progress Tracker/public/logo.png

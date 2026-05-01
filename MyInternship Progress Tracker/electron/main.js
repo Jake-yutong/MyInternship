@@ -21,6 +21,10 @@ function getDistDir() {
   return path.resolve(PROJECT_DIR, 'dist');
 }
 
+function getDesktopIconPath() {
+  return path.resolve(getDistDir(), 'logo.png');
+}
+
 async function waitForListening(server) {
   if (server.listening) {
     return;
@@ -83,6 +87,7 @@ async function createMainWindow() {
     autoHideMenuBar: true,
     title: 'MyInternship',
     backgroundColor: '#f7f7f5',
+    icon: getDesktopIconPath(),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

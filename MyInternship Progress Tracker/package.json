@@ -117,7 +117,8 @@
     "appId": "com.jakeyutong.myinternship",
     "productName": "MyInternship",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "public"
     },
     "files": [
       "dist/**/*",
@@ -134,7 +135,8 @@
         "AppImage"
       ],
       "category": "Office",
-      "artifactName": "${productName}.${ext}"
+      "artifactName": "${productName}.${ext}",
+      "icon": "logo.png"
     },
     "asarUnpack": [
       "server/**/*"

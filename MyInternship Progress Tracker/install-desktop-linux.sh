@@ -8,6 +8,8 @@ INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/myinternship-desktop"
 DESKTOP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 DESKTOP_FILE="$DESKTOP_DIR/myinternship-desktop.desktop"
 APPIMAGE_TARGET="$INSTALL_DIR/MyInternship.AppImage"
+ICON_SOURCE="$PROJECT_DIR/public/logo.png"
+ICON_TARGET="$INSTALL_DIR/logo.png"
 DATA_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/MyInternship/data"
 NPM_PATH="$(command -v npm || true)"
 
@@ -59,6 +61,7 @@ SOURCE_APPIMAGE="$(ensure_release_appimage)"
 
 mkdir -p "$INSTALL_DIR" "$DESKTOP_DIR"
 cp "$SOURCE_APPIMAGE" "$APPIMAGE_TARGET"
+cp "$ICON_SOURCE" "$ICON_TARGET"
 chmod +x "$APPIMAGE_TARGET"
 
 cat > "$DESKTOP_FILE" <<EOF
@@ -69,6 +72,7 @@ Name=MyInternship
 Comment=Track internship applications in a local desktop app
 Exec=$APPIMAGE_TARGET
 TryExec=$APPIMAGE_TARGET
+Icon=$ICON_TARGET
 Terminal=false
 Categories=Office;Utility;
 StartupNotify=true
