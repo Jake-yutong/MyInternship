@@ -136,6 +136,7 @@ http://127.0.0.1:8787/api/health
 - Electron 主进程会自动拉起本地 Express 服务
 - 前端页面会直接显示在桌面窗口里
 - SQLite 数据目录会切换到系统用户数据目录，不再依赖仓库里的 server/data
+- 网页页签图标、Electron 窗口图标和 Linux 桌面启动器图标统一使用 public/logo.png
 
 这意味着你可以把它当作一个真正的本地应用来打开和分发。
 
@@ -159,6 +160,7 @@ npm run desktop:install:linux
 
 - 若 release/ 下还没有 AppImage，则先执行桌面打包
 - 把 AppImage 复制到当前用户目录下的稳定安装路径
+- 把应用 logo 复制到安装目录，供桌面启动器直接显示
 - 创建应用菜单可见的桌面启动器
 
 安装后可以直接执行：
@@ -183,6 +185,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Jake-yutong/MyInternship/mai
 
 - 在 Linux 浏览器环境下，普通网页链接通常只能触发下载，不能像应用商店那样无提示静默安装
 - 当前最接近“点链接就安装”的可行方案，是把最新版 AppImage 挂到 GitHub Release，再提供下载链接或一条自动安装命令
+- 最新 Release 安装脚本会同时下载 AppImage 和 logo，确保安装后显示的是 MyInternship 自己的应用图标
 
 卸载时执行：
 

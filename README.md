@@ -85,12 +85,18 @@ http://127.0.0.1:8787/api/health
 - 直接本地启动桌面版：在项目目录运行 npm run desktop:start
 - 生成未打包桌面产物：npm run desktop:pack
 - 生成 Linux AppImage：npm run desktop:dist
+- 安装当前仓库里的 Linux 桌面版：npm run desktop:install:linux
+- 从 GitHub 最新 Release 下载并安装 Linux 桌面版：npm run desktop:install:release:linux
+- 打开已安装桌面版：npm run desktop:open
 
 桌面版特点：
 
 - 会在应用内部自动启动本地 Express + SQLite 服务
 - 不再依赖单独手动打开浏览器地址
 - 数据默认存到系统用户目录，而不是仓库目录里
+- Linux 桌面版的数据固定保存在 ~/.config/MyInternship/data/applications.sqlite
+- 关闭应用或卸载桌面启动器后，这份 SQLite 数据不会被自动清空
+- 网页页签图标、Electron 窗口图标和 Linux 桌面启动器图标现在统一使用同一份应用 logo
 
 当前优先支持 Linux 桌面环境。
 
