@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Application, getCompanyAccentColor } from '../data';
 
 /**
@@ -175,8 +175,27 @@ function extractDominantColor(imageUrl: string): Promise<string | null> {
  *
  * The map is populated asynchronously; the initial value uses the hash fallback
  * so bars are always visible even before extraction completes.
+ *
+ * The effect only re-runs when logo data or company names actually change, not
+ * on every applications array reference change (e.g. when unrelated fields like
+ * notes are updated). This prevents unnecessary re-renders and color re-extractions.
  */
 export function useLogoColors(applications: Application[]): Map<string, string> {
+  // Keep a ref to always access the latest applications inside the async effect,
+  // without including the full array reference in the effect dependency.
+  const applicationsRef = useRef(applications);
+  applicationsRef.current = applications;
+
+  // A string fingerprint of id+logo+companyName. The effect only re-fires when
+  // this string changes, i.e. when something color-relevant actually changes.
+  const logoFingerprint = useMemo(
+    () =>
+      applications
+        .map((app) => `${app.id}|${app.companyName}|${app.logo ? app.logo.slice(0, 64) : ''}`)
+        .join('\n'),
+    [applications],
+  );
+
   const [colorMap, setColorMap] = useState<Map<string, string>>(
     () => new Map(applications.map((app) => [app.id, getCompanyAccentColor(app.companyName)])),
   );
@@ -185,8 +204,9 @@ export function useLogoColors(applications: Application[]): Map<string, string> 
     let cancelled = false;
 
     const resolveColors = async () => {
+      const snapshot = applicationsRef.current;
       const entries = await Promise.all(
-        applications.map(async (app) => {
+        snapshot.map(async (app) => {
           const fallback = getCompanyAccentColor(app.companyName);
           if (!app.logo) {
             return [app.id, fallback] as const;
@@ -205,7 +225,8 @@ export function useLogoColors(applications: Application[]): Map<string, string> 
     return () => {
       cancelled = true;
     };
-  }, [applications]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logoFingerprint]);
 
   return colorMap;
 }

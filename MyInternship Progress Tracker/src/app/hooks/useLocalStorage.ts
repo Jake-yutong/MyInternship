@@ -40,9 +40,11 @@ export function useLocalStorage<T>(
 
   const [storedValue, setStoredValue] = useState<T>(() => readValue());
 
-  useEffect(() => {
-    setStoredValue(readValue());
-  }, [readValue]);
+  // NOTE: No effect to re-read storage here. The useState initializer above
+  // already reads from localStorage on first mount. Adding an effect that
+  // calls setStoredValue(readValue()) would create a new array reference
+  // (JSON.parse always returns a new object) and trigger a spurious re-render
+  // on every mount, which cascades into dependent hooks and components.
 
   const setValue = useCallback(
     (value: SetValue<T>) => {
