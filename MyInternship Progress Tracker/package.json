@@ -1,7 +1,7 @@
 {
   "name": "@figma/my-make-file",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MyInternship desktop-first internship application tracker",
   "author": "Jake-yutong",
   "type": "module",
@@ -16,7 +16,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "desktop:dist": "npm run build && electron-builder --linux AppImage",
+    "desktop:dist": "npm run build && electron-builder --linux AppImage --publish never",
     "desktop:install:linux": "bash ./install-desktop-linux.sh",
     "desktop:install:release:linux": "bash ./install-desktop-linux-from-release.sh",
     "desktop:open": "bash ./open-desktop.sh",
