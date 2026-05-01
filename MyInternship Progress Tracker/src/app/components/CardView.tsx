@@ -87,7 +87,7 @@ export function ApplicationCard({ application, onClick, onDelete }: CardProps) {
           {application.applyLink ? (
             <button
               onClick={handleApplyLink}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-blue-500 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-200"
               title="打开网申页面"
             >
               <ExternalLink size={15} />
