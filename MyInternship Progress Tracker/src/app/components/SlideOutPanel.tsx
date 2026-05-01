@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, UploadCloud, Link as LinkIcon, Calendar, MessageSquare, ChevronDown } from 'lucide-react';
+import { X, UploadCloud, Link as LinkIcon, Calendar, MessageSquare, ChevronDown, ExternalLink } from 'lucide-react';
 import { Application, ApplicationStatus, DATE_FIELDS, STATUS_CONFIG, TimelineDateField, createEmptyApplication, getCompanyAccentColor, getCompanyInitial, parseApplicationSource } from '../data';
 
 interface SlideOutPanelProps {
@@ -248,6 +248,24 @@ export function SlideOutPanel({ isOpen, onClose, application, onSave }: SlideOut
                 </div>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 leading-relaxed">
                   可直接粘贴招聘页链接，解析函数会尝试从域名或文本关键词补齐公司和岗位信息。
+                </p>
+              </div>
+
+              {/* Apply Link */}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">网申链接 (Apply Link)</label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={formData.applyLink}
+                    onChange={(e) => handleChange('applyLink', e.target.value)}
+                    className="w-full px-3 py-2 pl-9 border border-[#E9E9E7] dark:border-neutral-700 rounded-md outline-none focus:border-neutral-400 dark:focus:border-neutral-500 bg-transparent dark:bg-[#191919] text-sm text-neutral-900 dark:text-neutral-100 transition-colors"
+                    placeholder="https://（在线投递/网申系统链接）"
+                  />
+                  <ExternalLink size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+                </div>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 leading-relaxed">
+                  填写后，卡片上会出现一键直达图标，点击即可直接打开网申页面。
                 </p>
               </div>
 

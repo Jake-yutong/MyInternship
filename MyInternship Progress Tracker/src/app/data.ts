@@ -28,6 +28,7 @@ export type Application = {
   dates: ApplicationDates;
   logo: string | null;
   jobLink: string;
+  applyLink: string;
   notes: string;
   createdAt: string;
 };
@@ -229,6 +230,7 @@ export function createEmptyApplication(): Application {
     },
     logo: null,
     jobLink: '',
+    applyLink: '',
     notes: '',
     createdAt: now.toISOString(),
   };
@@ -337,6 +339,7 @@ function migrateLegacyApplication(input: Record<string, unknown>): Application {
     },
     logo: typeof input.logo === 'string' ? input.logo : null,
     jobLink: readString(input.jobLink),
+    applyLink: readString(input.applyLink),
     notes: readString(input.notes),
     createdAt,
   };
@@ -367,6 +370,7 @@ export function normalizeApplication(input: Partial<Application> | Record<string
     },
     logo: typeof record.logo === 'string' && record.logo.trim() ? record.logo : baseApplication.logo,
     jobLink: (readString(record.jobLink) || baseApplication.jobLink).trim(),
+    applyLink: (readString(record.applyLink) || baseApplication.applyLink).trim(),
     notes: readString(record.notes) || baseApplication.notes,
     createdAt: readString(record.createdAt) || baseApplication.createdAt || now.toISOString(),
   };

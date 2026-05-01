@@ -1,6 +1,6 @@
 import React from 'react';
 import { Application, STATUS_CONFIG, getCompanyAccentColor, getCompanyInitial } from '../data';
-import { Plus, Clock, ArrowRight, Quote, Trash2 } from 'lucide-react';
+import { Plus, Clock, ArrowRight, Quote, Trash2, ExternalLink } from 'lucide-react';
 
 interface CardProps {
   application: Application;
@@ -16,6 +16,11 @@ export function ApplicationCard({ application, onClick, onDelete }: CardProps) {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete(application);
+  };
+
+  const handleApplyLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(application.applyLink, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -79,6 +84,15 @@ export function ApplicationCard({ application, onClick, onDelete }: CardProps) {
           >
             <Trash2 size={15} />
           </button>
+          {application.applyLink ? (
+            <button
+              onClick={handleApplyLink}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
+              title="打开网申页面"
+            >
+              <ExternalLink size={15} />
+            </button>
+          ) : null}
           <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-200 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700 transition-all duration-300">
             <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </div>
