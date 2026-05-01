@@ -1,0 +1,40 @@
+name: release-desktop-linux
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release-linux-appimage:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: MyInternship Progress Tracker
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install --no-package-lock
+
+      - name: Build AppImage
+        run: npm run desktop:dist
+
+      - name: Publish GitHub release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            MyInternship Progress Tracker/release/*.AppImage
+            MyInternship Progress Tracker/release/latest-linux.yml

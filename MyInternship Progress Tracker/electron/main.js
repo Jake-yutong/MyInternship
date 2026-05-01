@@ -6,6 +6,9 @@ import { startServer } from '../server/index.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIR = path.resolve(MODULE_DIR, '..');
+const DESKTOP_USER_DATA_DIR = path.join(app.getPath('appData'), 'MyInternship');
+
+app.setPath('userData', DESKTOP_USER_DATA_DIR);
 
 let mainWindow = null;
 let backendServer = null;
@@ -51,7 +54,7 @@ async function ensureBackendStarted() {
 
   process.env.NODE_ENV = 'production';
   process.env.MYINTERNSHIP_API_HOST = '127.0.0.1';
-  process.env.MYINTERNSHIP_DATA_DIR = path.join(app.getPath('userData'), 'data');
+  process.env.MYINTERNSHIP_DATA_DIR = path.join(DESKTOP_USER_DATA_DIR, 'data');
 
   const { server } = startServer({
     host: '127.0.0.1',

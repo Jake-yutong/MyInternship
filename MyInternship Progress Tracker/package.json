@@ -17,6 +17,9 @@
     "build": "vite build",
     "dev": "vite",
     "desktop:dist": "npm run build && electron-builder --linux AppImage",
+    "desktop:install:linux": "bash ./install-desktop-linux.sh",
+    "desktop:install:release:linux": "bash ./install-desktop-linux-from-release.sh",
+    "desktop:open": "bash ./open-desktop.sh",
     "desktop:pack": "npm run build && electron-builder --dir",
     "desktop:start": "npm run build && electron .",
     "dev:server": "node ./server/index.js",
@@ -24,6 +27,7 @@
     "open:local": "bash ./open-local.sh",
     "start:server": "node ./server/index.js",
     "start:local": "bash ./start-local.sh",
+    "desktop:uninstall:linux": "bash ./uninstall-desktop-linux.sh",
     "uninstall:local:linux": "bash ./uninstall-local-linux.sh"
   },
   "dependencies": {
@@ -129,7 +133,8 @@
       "target": [
         "AppImage"
       ],
-      "category": "Office"
+      "category": "Office",
+      "artifactName": "${productName}.${ext}"
     },
     "asarUnpack": [
       "server/**/*"

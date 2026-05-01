@@ -126,6 +126,10 @@ http://127.0.0.1:8787/api/health
 - npm run desktop:start: 构建后直接启动桌面应用
 - npm run desktop:pack: 生成未打包桌面产物，输出到 release/linux-unpacked
 - npm run desktop:dist: 生成 Linux AppImage
+- npm run desktop:install:linux: 将 AppImage 安装到当前用户目录并创建桌面启动器
+- npm run desktop:install:release:linux: 直接从 GitHub 最新 Release 下载并安装 Linux 桌面版
+- npm run desktop:open: 优先打开已安装桌面版，没有时自动安装或直接运行 release 下的 AppImage
+- npm run desktop:uninstall:linux: 移除桌面版 AppImage 和桌面启动器
 
 桌面模式下：
 
@@ -134,6 +138,57 @@ http://127.0.0.1:8787/api/health
 - SQLite 数据目录会切换到系统用户数据目录，不再依赖仓库里的 server/data
 
 这意味着你可以把它当作一个真正的本地应用来打开和分发。
+
+桌面模式下的数据不会因为关闭应用而清空。当前 Linux 桌面版会把 SQLite 数据固定保存到：
+
+```text
+~/.config/MyInternship/data/applications.sqlite
+```
+
+只要你没有手动删除这个目录，或者代码里没有主动清库，下次打开桌面应用时会继续读取这份数据。卸载桌面启动器和 AppImage 也不会删除这里的历史数据。
+
+### Linux 桌面安装
+
+如果你已经确认要以 Electron 桌面程序的形式长期使用，推荐直接执行：
+
+```bash
+npm run desktop:install:linux
+```
+
+它会自动完成下面这些动作：
+
+- 若 release/ 下还没有 AppImage，则先执行桌面打包
+- 把 AppImage 复制到当前用户目录下的稳定安装路径
+- 创建应用菜单可见的桌面启动器
+
+安装后可以直接执行：
+
+```bash
+npm run desktop:open
+```
+
+如果你是分发给别人使用，而不是在本仓库本地安装，可以直接提供最新 Release 页面链接：
+
+```text
+https://github.com/Jake-yutong/MyInternship/releases/latest
+```
+
+或者让对方执行下面这条命令，直接从 GitHub 最新 Release 下载并安装：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Jake-yutong/MyInternship/main/MyInternship%20Progress%20Tracker/install-desktop-linux-from-release.sh)
+```
+
+补充说明：
+
+- 在 Linux 浏览器环境下，普通网页链接通常只能触发下载，不能像应用商店那样无提示静默安装
+- 当前最接近“点链接就安装”的可行方案，是把最新版 AppImage 挂到 GitHub Release，再提供下载链接或一条自动安装命令
+
+卸载时执行：
+
+```bash
+npm run desktop:uninstall:linux
+```
 
 ## 手动命令
 
@@ -149,8 +204,12 @@ npm run build
 
 - npm run dev: 启动 Vite 开发服务器
 - npm run desktop:start: 启动桌面应用
+- npm run desktop:open: 打开已安装桌面版，或回退到 release 下的 AppImage
 - npm run desktop:pack: 生成未打包桌面产物
 - npm run desktop:dist: 生成 Linux AppImage
+- npm run desktop:install:linux: 安装 Linux 桌面版并创建菜单启动器
+- npm run desktop:install:release:linux: 从 GitHub 最新 Release 下载并安装 Linux 桌面版
+- npm run desktop:uninstall:linux: 卸载 Linux 桌面版和菜单启动器
 - npm run dev:server: 启动本地后端 API
 - npm run install:local:linux: 一次性安装 Linux 本地服务和桌面启动器
 - npm run open:local: 打开本地应用，必要时自动拉起服务
