@@ -11,12 +11,18 @@ https://www.figma.com/design/uMmWLsstRjQ8E3DrRprJ3Z/MyInternship-Progress-Tracke
 当前已经验证可用的链接如下：
 
 - 仓库地址：https://github.com/Jake-yutong/MyInternship
+- 在线使用地址：https://jake-yutong.github.io/MyInternship/
+- 最新 Linux 桌面版下载：https://github.com/Jake-yutong/MyInternship/releases/latest/download/MyInternship.AppImage
+- 最新桌面版发布页：https://github.com/Jake-yutong/MyInternship/releases/latest
 - 本地前端开发地址：http://127.0.0.1:5173
 - 本地单服务访问地址：http://127.0.0.1:8787
 - 本地健康检查地址：http://127.0.0.1:8787/api/health
 
 补充说明：
 
+- 在线使用地址由 GitHub Pages 提供，首次部署完成后可直接点击打开
+- GitHub Pages 版本运行在浏览器本地缓存模式，适合直接分享链接使用
+- Linux 桌面版下载链接会始终指向仓库最新 Release 的 AppImage
 - 本地前端开发地址适用于 npm run start:local 或 npm run dev
 - 本地单服务访问地址适用于 npm run build 后再运行 npm run start:server
 - 当前还没有固定的公开线上域名；完成云端部署后，只需要把 127.0.0.1:8787 替换成正式域名
