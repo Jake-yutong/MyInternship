@@ -57,6 +57,9 @@ export default function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const applicationsRef = useRef(applications);
+  applicationsRef.current = applications;
+  const applicationsVersionRef = useRef(0);
   const latestSaveRequestIdRef = useRef(0);
   const pendingSaveCountRef = useRef(0);
 
@@ -84,27 +87,31 @@ export default function App() {
     let cancelled = false;
 
     const bootstrapApplications = async () => {
+      const bootstrapApplicationsVersion = applicationsVersionRef.current;
+      let bootstrapRequestedSyncing = false;
       setPersistenceMode('connecting');
 
       try {
         const remotePayload = await fetchApplicationsFromServer();
 
         if (!remotePayload.found && storageResolution.applications.length > 0) {
+          bootstrapRequestedSyncing = true;
           setIsSyncing(true);
 
           const seededPayload = await saveApplicationsToServer(storageResolution.applications);
-          if (cancelled) {
+          if (cancelled || bootstrapApplicationsVersion !== applicationsVersionRef.current) {
             return;
           }
 
           setApplications(seededPayload.applications);
+          syncSelectedApplication(seededPayload.applications);
           setPersistenceMode('server');
           setLastSyncedAt(seededPayload.savedAt);
           setSyncMessage('已将浏览器中的历史记录迁移到后端。');
           return;
         }
 
-        if (cancelled) {
+        if (cancelled || bootstrapApplicationsVersion !== applicationsVersionRef.current) {
           return;
         }
 
@@ -114,18 +121,19 @@ export default function App() {
         setLastSyncedAt(remotePayload.savedAt);
         setSyncMessage(remotePayload.recovered ? '后端主数据异常，已自动从备份恢复。' : null);
       } catch {
-        if (cancelled) {
+        if (cancelled || bootstrapApplicationsVersion !== applicationsVersionRef.current) {
           return;
         }
 
         if (!storageResolution.found) {
           setApplications(MOCK_APPLICATIONS);
+          syncSelectedApplication(MOCK_APPLICATIONS);
         }
 
         setPersistenceMode('local');
         setSyncMessage('后端暂时不可用，当前继续使用浏览器本地缓存。');
       } finally {
-        if (!cancelled) {
+        if (!cancelled && bootstrapRequestedSyncing && pendingSaveCountRef.current === 0) {
           setIsSyncing(false);
         }
       }
@@ -139,6 +147,7 @@ export default function App() {
   }, [setApplications]);
 
   const persistApplications = async (nextApplications: Application[]) => {
+    applicationsVersionRef.current += 1;
     setApplications(nextApplications);
     syncSelectedApplication(nextApplications);
     const requestId = ++latestSaveRequestIdRef.current;
@@ -188,7 +197,7 @@ export default function App() {
       id: savedApp.id || generateApplicationId(),
     });
 
-    const previousApplications = applications;
+    const previousApplications = applicationsRef.current;
     const nextApplications = (() => {
       const existingApplication = previousApplications.some((application) => application.id === normalizedApp.id);
       if (existingApplication) {
@@ -199,8 +208,6 @@ export default function App() {
     })();
 
     void persistApplications(nextApplications);
-
-    setSelectedApp(normalizedApp);
   };
 
   const handleDeleteRequest = (app: Application) => {
@@ -209,7 +216,7 @@ export default function App() {
 
   const handleConfirmDelete = () => {
     if (appToDelete) {
-      const nextApplications = applications.filter((application) => application.id !== appToDelete.id);
+      const nextApplications = applicationsRef.current.filter((application) => application.id !== appToDelete.id);
       void persistApplications(nextApplications);
       setAppToDelete(null);
     }
