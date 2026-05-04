@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ThemeProvider } from 'next-themes';
 import { fetchApplicationsFromServer, saveApplicationsToServer } from './api';
 import { Sidebar } from './components/Sidebar';
@@ -57,6 +57,18 @@ export default function App() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const latestSaveRequestIdRef = useRef(0);
+  const pendingSaveCountRef = useRef(0);
+
+  const syncSelectedApplication = (nextApplications: Application[]) => {
+    setSelectedApp((currentSelectedApp) => {
+      if (!currentSelectedApp) {
+        return currentSelectedApp;
+      }
+
+      return nextApplications.find((application) => application.id === currentSelectedApp.id) ?? currentSelectedApp;
+    });
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -97,6 +109,7 @@ export default function App() {
         }
 
         setApplications(remotePayload.applications);
+        syncSelectedApplication(remotePayload.applications);
         setPersistenceMode('server');
         setLastSyncedAt(remotePayload.savedAt);
         setSyncMessage(remotePayload.recovered ? '后端主数据异常，已自动从备份恢复。' : null);
@@ -127,19 +140,35 @@ export default function App() {
 
   const persistApplications = async (nextApplications: Application[]) => {
     setApplications(nextApplications);
+    syncSelectedApplication(nextApplications);
+    const requestId = ++latestSaveRequestIdRef.current;
+    pendingSaveCountRef.current += 1;
     setIsSyncing(true);
 
     try {
       const remotePayload = await saveApplicationsToServer(nextApplications);
+
+      if (requestId !== latestSaveRequestIdRef.current) {
+        return;
+      }
+
       setApplications(remotePayload.applications);
+      syncSelectedApplication(remotePayload.applications);
       setPersistenceMode('server');
       setLastSyncedAt(remotePayload.savedAt);
       setSyncMessage(null);
     } catch {
+      if (requestId !== latestSaveRequestIdRef.current) {
+        return;
+      }
+
       setPersistenceMode('local');
       setSyncMessage('后端保存失败，当前变更仅保存在浏览器本地缓存。');
     } finally {
-      setIsSyncing(false);
+      pendingSaveCountRef.current = Math.max(0, pendingSaveCountRef.current - 1);
+      if (pendingSaveCountRef.current === 0) {
+        setIsSyncing(false);
+      }
     }
   };
 
