@@ -52,8 +52,18 @@ export function useLocalStorage<T>(
         return;
       }
 
+      // Compute the next value first. If this throws (e.g. a bad updater function),
+      // it's a programmer error and should propagate.
+      const nextValue = value instanceof Function ? value(readValue()) : value;
+
+      // Always update React state immediately so the UI reflects the change,
+      // regardless of whether the localStorage write succeeds.
+      setStoredValue(nextValue);
+
+      // Attempt to persist to localStorage as a best-effort operation.
+      // If the write fails (e.g. QuotaExceededError), the value is still
+      // available in memory for the current session.
       try {
-        const nextValue = value instanceof Function ? value(readValue()) : value;
         const nextValueRaw = serialize(nextValue);
         const previousValueRaw = window.localStorage.getItem(key);
         let shouldBackupPreviousValue = false;
@@ -72,9 +82,9 @@ export function useLocalStorage<T>(
         }
 
         window.localStorage.setItem(key, nextValueRaw);
-        setStoredValue(nextValue);
       } catch {
-        setStoredValue(readValue());
+        // localStorage write failed; the value is updated in memory for this session
+        // but will not persist across page reloads.
       }
     },
     [backupKey, deserialize, key, readValue, serialize],
