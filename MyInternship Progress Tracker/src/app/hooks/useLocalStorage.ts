@@ -60,31 +60,41 @@ export function useLocalStorage<T>(
       // regardless of whether the localStorage write succeeds.
       setStoredValue(nextValue);
 
-      // Attempt to persist to localStorage as a best-effort operation.
-      // If the write fails (e.g. QuotaExceededError), the value is still
-      // available in memory for the current session.
+      // Attempt to serialize. If this throws (e.g. circular reference), bail early
+      // since there's nothing useful to write to storage.
+      let nextValueRaw: string;
       try {
-        const nextValueRaw = serialize(nextValue);
-        const previousValueRaw = window.localStorage.getItem(key);
-        let shouldBackupPreviousValue = false;
+        nextValueRaw = serialize(nextValue);
+      } catch {
+        return;
+      }
 
-        if (backupKey && previousValueRaw !== null && previousValueRaw !== nextValueRaw) {
-          try {
-            deserialize(previousValueRaw);
-            shouldBackupPreviousValue = true;
-          } catch {
-            shouldBackupPreviousValue = false;
+      // Best-effort backup: write the previous value to the backup key before
+      // overwriting the primary key. Any failure here must NOT block the primary
+      // write below, so it gets its own isolated try-catch.
+      if (backupKey) {
+        try {
+          const previousValueRaw = window.localStorage.getItem(key);
+          if (previousValueRaw !== null && previousValueRaw !== nextValueRaw) {
+            try {
+              deserialize(previousValueRaw);
+              window.localStorage.setItem(backupKey, previousValueRaw);
+            } catch {
+              // backup write failed — that's OK, continue to primary write
+            }
           }
+        } catch {
+          // reading the previous value failed — skip backup, continue to primary write
         }
+      }
 
-        if (backupKey && shouldBackupPreviousValue && previousValueRaw !== null) {
-          window.localStorage.setItem(backupKey, previousValueRaw);
-        }
-
+      // Primary write: this is the critical operation. A failure here means the
+      // value won't survive a page reload, but the in-memory state is already
+      // updated above so the UI remains consistent for the current session.
+      try {
         window.localStorage.setItem(key, nextValueRaw);
       } catch {
-        // localStorage write failed; the value is updated in memory for this session
-        // but will not persist across page reloads.
+        // primary write failed (e.g. QuotaExceededError, SecurityError)
       }
     },
     [backupKey, deserialize, key, readValue, serialize],
